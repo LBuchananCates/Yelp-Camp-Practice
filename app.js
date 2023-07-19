@@ -3,6 +3,8 @@ const express = require('express');
 const path = require('path');
 // connecting mongoose
 const mongoose = require('mongoose');
+// requiring method override
+const methodOverride = require('method-override');
 // requiring model
 const Campground = require('./models/campground');
 
@@ -26,6 +28,8 @@ app.set('views', path.join(__dirname, 'views'))
 
 // tell express to parse the body; this is for the post req with 😱😱😱
 app.use(express.urlencoded({extended:true}))
+// set up method override 🫠🫠🫠
+app.use(methodOverride('_method'));
 
 // home route
 app.get('/', (req, res) => {
@@ -44,13 +48,6 @@ app.get('/campgrounds/new', (req, res) => {
     res.render('campgrounds/new');
 })
 
-// route for individual campground
-app.get('/campgrounds/:id', async (req, res) => {
-    // find by id: pass in the id with req.params.id
-    const campground = await Campground.findById(req.params.id)
-    res.render('campgrounds/show', {campground});
-})
-
 // setting up endpoint as post to which form is submitted 😱😱😱
 app.post('/campgrounds', async (req, res) => {
     const campground = new Campground(req.body.campground);
@@ -59,6 +56,29 @@ app.post('/campgrounds', async (req, res) => {
     res.redirect(`/campgrounds/${campground._id}`)
 })
 
+// route for individual campground
+app.get('/campgrounds/:id', async (req, res) => {
+    // find by id: pass in the id with req.params.id
+    const campground = await Campground.findById(req.params.id)
+    res.render('campgrounds/show', {campground});
+})
+
+// route for editing
+app.get('/campgrounds/:id/edit', async (req, res) => {
+    // looking up cg by id
+    const campground = await Campground.findById(req.params.id)
+    res.render('campgrounds/edit', {campground});
+})
+
+// after method override 🫠🫠🫠
+app.put('/campgrounds/:id', async(req, res) => {
+    // this gives us the id
+    const {id} = req.params;
+    // second argument is query to update
+    const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
+    // redirect to campground showpage of campground just updated
+    res.redirect(`/campgrounds/${campground._id}`)
+})
 
 app.listen(3000, () => {
     console.log('serving on port 3000!')
