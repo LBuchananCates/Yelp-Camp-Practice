@@ -78,6 +78,16 @@ app.put('/campgrounds/:id', async(req, res) => {
     const campground = await Campground.findByIdAndUpdate(id, {...req.body.campground});
     // redirect to campground showpage of campground just updated
     res.redirect(`/campgrounds/${campground._id}`)
+});
+
+// delete route; needs id included
+app.delete('/campgrounds/:id', async (req, res) => {
+    // take id to destructure it
+    const {id} = req.params;
+    // to delete: find info about cg and remove
+    await Campground.findByIdAndDelete(id);
+    res.redirect('/campgrounds');
+    // then make button to send delete request, go to showpage
 })
 
 app.listen(3000, () => {
