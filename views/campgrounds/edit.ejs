@@ -9,11 +9,13 @@
                     <label class="form-label" for="title">Title</label>
                     <input class="form-control" type="text" id="title" name="campground[title]"
                         value="<%=campground.title%>" required>
+                    <div class="valid-feedback">Looks good!</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location</label>
                     <input class="form-control" type="text" id="location" name="campground[location]"
                         value="<%=campground.location%>" required>
+                    <div class="valid-feedback">Looks good!</div>
                 </div>
 
 
@@ -21,6 +23,7 @@
                     <label class="form-label" for="image">Image URL</label>
                     <input class="form-control" type="text" id="image" name="campground[image]"
                         value="<%=campground.image%>" required>
+                    <div class="valid-feedback">Looks good!</div>
                 </div>
 
                 <div class="mb-3">
@@ -36,7 +39,9 @@
                     <label class="form-label" for="description">Description</label>
                     <textarea class="form-control" type="text" id="description" name="campground[description]"
                         required><%= campground.description %></textarea>
+                    <div class="valid-feedback">Looks good!</div>
                 </div>
+
                 <div class="mb-3">
                     <button class="btn btn-info">Update Campground</button>
                 </div>
