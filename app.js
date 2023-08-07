@@ -5,8 +5,10 @@ const path = require('path');
 const mongoose = require('mongoose');
 // requiring ejs mate
 const ejsMate = require('ejs-mate');
-// 
+// catch requirement
 const catchAsync = require('./utils/catchAsync');
+// requiring ExpressError class
+const ExpressError = require('./utils/ExpressError');
 // requiring method override
 const methodOverride = require('method-override');
 // requiring model
@@ -55,6 +57,7 @@ app.get('/campgrounds/new', (req, res) => {
 
 // setting up endpoint as post to which form is submitted 😱😱😱
 app.post('/campgrounds', catchAsync(async (req, res, next) => {
+    if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400);
     const campground = new Campground(req.body.campground);
     await campground.save();
     // redirect to newly created campground
@@ -95,9 +98,15 @@ app.delete('/campgrounds/:id', catchAsync(async (req, res) => {
     // then make button to send delete request, go to showpage
 }));
 
+app.all('*', (req, res, next) => {
+    next(new ExpressError('Page not Found', 404))
+})
+
 // error handlers MUST follow all async functions
 app.use((err, req, res, next) => {
-    res.send('Oh boy, something went wrong!')
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'oh no!'
+    res.status(statusCode).render('error', { err })
 })
 
 app.listen(3000, () => {
