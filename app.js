@@ -5,8 +5,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 // requiring ejs mate
 const ejsMate = require('ejs-mate');
-// requiring JOI (error validating)
-const Joi = require('joi')
+// destructing b/c will eventually have multiple schemas to export
+const { campgroundSchema } = require('./schemas.js');
 // catch requirement
 const catchAsync = require('./utils/catchAsync');
 // requiring ExpressError class
@@ -40,6 +40,16 @@ app.use(express.urlencoded({ extended: true }))
 // set up method override 🫠🫠🫠
 app.use(methodOverride('_method'));
 
+const validateCampground = (req, res, next) => {
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    } else {
+        next();
+    }
+}
+
 // home route
 app.get('/', (req, res) => {
     res.render('home')
@@ -58,23 +68,9 @@ app.get('/campgrounds/new', (req, res) => {
 })
 
 // setting up endpoint as post to which form is submitted 😱😱😱
-app.post('/campgrounds', catchAsync(async (req, res, next) => {
+app.post('/campgrounds', validateCampground, catchAsync(async (req, res, next) => {
     // if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400);
-    const campgroundSchema = Joi.object({
-        campground: Joi.object({
-            title: Joi.string().required(),
-            price: Joi.number().required().min(0),
-            image: Joi.string().required(),
-            location: Joi.string().required(),
-            description: Joi.string().required()
-        }).required()
-    })
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400)
-    }
-    console.log(result)
+
     const campground = new Campground(req.body.campground);
     await campground.save();
     // redirect to newly created campground
@@ -96,7 +92,7 @@ app.get('/campgrounds/:id/edit', catchAsync(async (req, res) => {
 }));
 
 // after method override 🫠🫠🫠
-app.put('/campgrounds/:id', catchAsync(async (req, res) => {
+app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
     // this gives us the id
     const { id } = req.params;
     // second argument is query to update
