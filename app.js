@@ -5,6 +5,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 // requiring ejs mate
 const ejsMate = require('ejs-mate');
+// requiring JOI (error validating)
+const Joi = require('joi')
 // catch requirement
 const catchAsync = require('./utils/catchAsync');
 // requiring ExpressError class
@@ -57,7 +59,22 @@ app.get('/campgrounds/new', (req, res) => {
 
 // setting up endpoint as post to which form is submitted 😱😱😱
 app.post('/campgrounds', catchAsync(async (req, res, next) => {
-    if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400);
+    // if (!req.body.campground) throw new ExpressError('Invalid Campground Data', 400);
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+            image: Joi.string().required(),
+            location: Joi.string().required(),
+            description: Joi.string().required()
+        }).required()
+    })
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',')
+        throw new ExpressError(msg, 400)
+    }
+    console.log(result)
     const campground = new Campground(req.body.campground);
     await campground.save();
     // redirect to newly created campground
