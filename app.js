@@ -115,6 +115,7 @@ app.all('*', (req, res, next) => {
     next(new ExpressError('Page not Found', 404))
 })
 
+// set up default error handler w/ error template that we render
 // error handlers MUST follow all async functions
 app.use((err, req, res, next) => {
     const { statusCode = 500 } = err;

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // import cities array
 const cities = require('./cities');
 // import and destructure
-const {places, descriptors} = require('./seedhelpers');
+const { places, descriptors } = require('./seedhelpers');
 // requiring model
 const Campground = require('../models/campground');
 
@@ -23,7 +23,7 @@ db.once('open', () => {
 // pass in array, return element from it; this is its own function
 const sample = array => array[Math.floor(Math.random() * array.length)];
 
-const seedDB = async() => {
+const seedDB = async () => {
     await Campground.deleteMany({});
     for (let i = 0; i < 50; i++) {
         // there are 1000 cities
@@ -32,15 +32,15 @@ const seedDB = async() => {
         const price = Math.floor(Math.random() * 20) + 10;
         // make new campground
         const camp = new Campground({
-        // set location to be city, state
-        location: `${cities[random1000].city}, ${cities[random1000].state}`,
-        // to pick random element from array
-        title: `${sample(descriptors)} ${sample(places)}`,
-        // to pick random image
-        image: 'https://source.unsplash.com/collection/483251',
-        description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo expedita dolore molestias dolorem, modi officiis repellat animi deleniti dolorum non omnis ratione in suscipit. Doloremque nesciunt a eaque. Saepe, minima?',
-        price
-       })
+            // set location to be city, state
+            location: `${cities[random1000].city}, ${cities[random1000].state}`,
+            // to pick random element from array
+            title: `${sample(descriptors)} ${sample(places)}`,
+            // to pick random image
+            image: 'https://source.unsplash.com/collection/483251',
+            description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo expedita dolore molestias dolorem, modi officiis repellat animi deleniti dolorum non omnis ratione in suscipit. Doloremque nesciunt a eaque. Saepe, minima?',
+            price
+        })
         // saves
         await camp.save();
     }
